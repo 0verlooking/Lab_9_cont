@@ -11,15 +11,17 @@ pipeline {
             steps {
                 catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
                     echo 'Testing...'
-                    bat 'docker run --rm my-app test-command'
+                    bat 'docker run --rm my-app npm test' // Замініть на вашу команду
                 }
             }
         }
         stage('Deploy') {
             steps {
                 echo 'Deploying...'
-                bat 'docker stop my-app || true'
-                bat 'docker rm my-app || true'
+                catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
+                    bat 'docker stop my-app || true'
+                    bat 'docker rm my-app || true'
+                }
                 bat 'docker run -d --name my-app -p 8080:80 my-app'
             }
         }

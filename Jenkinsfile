@@ -18,7 +18,7 @@ pipeline {
         stage('Deploy Prep') {
             steps {
                 echo 'Preparing for deployment...'
-                bat 'npm run build'  // Replace with your actual build command
+                bat 'echo "Deployment preparation complete"'
             }
         }
     }

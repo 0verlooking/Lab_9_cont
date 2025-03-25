@@ -21,7 +21,7 @@ pipeline {
                 bat '''
                 FOR /F "tokens=5" %P IN ('netstat -ano ^| findstr :3000') DO (
                     echo Terminating process with PID: %P
-                    taskkill /F /PID %P || echo Process already terminated
+                    taskkill /F /PID %P 2>nul || echo Process already terminated
                 )
                 '''
                 echo 'Deploying the application...'
@@ -34,7 +34,8 @@ pipeline {
             echo 'Performing cleanup actions...'
             catchError(buildResult: 'SUCCESS') {
                 bat '''
-                tasklist | findstr node.exe >nul && (
+                tasklist | findstr "node.exe" >nul && (
+                    echo Stopping Node.js processes...
                     taskkill /IM node.exe /F
                 ) || echo No active Node.js processes found
                 '''

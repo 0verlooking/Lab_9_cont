@@ -17,11 +17,11 @@ pipeline {
         }
         stage('Deploy') {
             steps {
-                echo 'Stopping any existing application on port 3000...'
+                echo 'Trying to stop any application using port 3000...'
                 bat '''
-                FOR /F "tokens=5" %P IN ('netstat -ano ^| findstr :3000') DO (
-                    echo Terminating process with PID: %P
-                    taskkill /F /PID %P 2>nul || echo Process already terminated
+                for /f "tokens=5" %P in ('netstat -ano ^| findstr :3000') do (
+                    echo Attempting to stop process with PID: %P
+                    taskkill /F /PID %P >nul 2>&1 || echo Process %P was already stopped.
                 )
                 '''
                 echo 'Deploying the application...'
@@ -31,15 +31,13 @@ pipeline {
     }
     post {
         always {
-            echo 'Performing cleanup actions...'
-            catchError(buildResult: 'SUCCESS') {
-                bat '''
-                tasklist | findstr "node.exe" >nul && (
-                    echo Stopping Node.js processes...
-                    taskkill /IM node.exe /F
-                ) || echo No active Node.js processes found
-                '''
-            }
+            echo 'Performing cleanup...'
+            bat '''
+            tasklist | findstr /I "node.exe" >nul && (
+                echo Cleaning up Node.js processes...
+                taskkill /IM node.exe /F >nul 2>&1 || echo Node.js already stopped.
+            ) || echo No Node.js processes found.
+            '''
         }
         success {
             echo 'Build completed successfully!'

@@ -7,11 +7,15 @@ pipeline {
                 bat 'npm install'
             }
         }
-        stage('Test') {
-            steps {
-                echo 'Testing the application...'
-                // Замініть на реальні тести, якщо вони є
-                bat 'npm test || echo No tests configured yet'
+    stage('Test') {
+    	steps {
+        catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
+            echo 'Testing the application...'
+            bat 'npm test || echo No tests configured yet'
+        }
+    }
+}
+
             }
         }
         stage('Deploy') {

@@ -7,15 +7,12 @@ pipeline {
                 bat 'npm install'
             }
         }
-    stage('Test') {
-    	steps {
-        catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
-            echo 'Testing the application...'
-            bat 'npm test || echo No tests configured yet'
-        }
-    }
-}
-
+        stage('Test') {
+            steps {
+                catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
+                    echo 'Testing the application...'
+                    bat 'npm test || echo No tests configured yet'
+                }
             }
         }
         stage('Deploy') {
@@ -30,7 +27,9 @@ pipeline {
     post {
         always {
             echo 'Cleaning up after build...'
-            bat 'taskkill /IM node.exe /F || echo No Node.js processes running'
+            catchError(buildResult: 'SUCCESS') {
+                bat 'taskkill /IM node.exe /F || echo No Node.js processes running'
+            }
         }
         success {
             echo 'Build completed successfully!'

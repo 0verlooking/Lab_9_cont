@@ -25,7 +25,7 @@ pipeline {
     post {
         always {
             echo 'Performing cleanup...'
-            bat 'taskkill /IM node.exe /F > nul 2>&1 || echo "No Node.js processes running"'
+            bat 'taskkill /IM node.exe /F > nul 2>&1 || echo "No Node.js processes running" || exit 0'
         }
         success {
             echo 'Build succeeded! Artifacts are ready for deployment.'
